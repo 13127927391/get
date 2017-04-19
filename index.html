@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>地址联动</title>
+	<script src='https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js'></script>
+	<style>
+		select{
+			width:120px;
+		}
+	</style>
+</head>
+<body>
+	<select id="s1"></select>
+	<select id="s2"></select>
+	<select id="s3"></select>
+	<select id="s4"></select>
+	<script>
+		//给s1, s2 , s3绑定change 事件
+		$("#s1,#s2,#s3").change(function(){
+			getData($(this).next('select'),$(this).val());
+		})
+		//先调用一次
+		/*
+		*   参数一：  请求的数据给谁
+		*   参数二：  upid
+		*/
+		getData($('#s1'),0);
+		function getData(select,index){
+			$.ajax({
+				url:'index.php',
+				type:'get',
+				dataType:'json',
+				data:{upid:index},
+				success:function(data){
+					select.nextAll('select').addBack().empty().hide();
+					if(data.length <= 0){
+						return;
+					}
+					select.show();
+					$.each(data,function(key,value){
+					$("<option>").html(value.name)
+								 .val(value.id)	
+								 .appendTo(select);
+				})
+				//遍历完数据以后  自动触发change事件
+				select.trigger('change'); 	
+				},
+				error:function(){
+					console.log('查询失败');
+				}
+			})
+		}
+	</script>
+</body>
+</html>
